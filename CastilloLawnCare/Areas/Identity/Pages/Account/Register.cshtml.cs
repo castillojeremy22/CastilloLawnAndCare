@@ -26,6 +26,7 @@ namespace CastilloLawnCare.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserStore<User> _userStore;
         private readonly IUserEmailStore<User> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
@@ -36,7 +37,8 @@ namespace CastilloLawnCare.Areas.Identity.Pages.Account
             IUserStore<User> userStore,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +46,7 @@ namespace CastilloLawnCare.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         /// <summary>
@@ -134,7 +137,16 @@ namespace CastilloLawnCare.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                var user = new User
+                {
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName,
+                    City = Input.City,
+                    State = Input.State,
+                    Address = Input.Address,
+                    Email = Input.Email
+                };
+                //var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -143,8 +155,13 @@ namespace CastilloLawnCare.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-
+                    var defaultRole = _roleManager.FindByIdAsync("2").Result;
                     var userId = await _userManager.GetUserIdAsync(user);
+                     
+                    if(defaultRole != null)
+                    {
+                        IdentityResult roleResult = await _userManager.AddToRoleAsync(user, defaultRole.NormalizedName);
+                    }
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
