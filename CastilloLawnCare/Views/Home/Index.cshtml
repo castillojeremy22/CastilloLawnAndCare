@@ -2,4 +2,10 @@
     ViewData["Title"] = "Home Page";
 }
 
-
+<div>
+    <h1>Reviews from Customers</h1>
+    <div id=reviewBody>
+        @Html.Label("Leave a Review")
+        @Html.TextArea("Review", "", new {@class = "from-control"})
+    </div>
+</div>
