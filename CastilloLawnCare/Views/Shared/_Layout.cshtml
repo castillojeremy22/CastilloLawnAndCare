@@ -7,43 +7,107 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CastilloLawnCare.styles.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css" rel="stylesheet" />
     <style>
-        #imageOverlay{
+        #imageOverlay {
             width: 100%;
             height: 450px;
             margin-top: -15px;
-            
         }
 
-        #grassImage{
+        #grassImage {
             width: 100%;
             max-height: 100%;
-            display:block;
+            display: block;
             border-bottom-left-radius: 10px;
             border-bottom-right-radius: 10px
         }
-        
+
         #logo {
-            position:absolute;
+            position: absolute;
             width: 100px;
             margin-top: 20px;
         }
 
         #labelLogo {
-            position:absolute;
+            position: absolute;
             margin-top: -400px;
             width: 350px;
             height: 150px;
-            margin-left: 500px;
+            margin-left: 575px;
         }
 
-        #labelName{
+        #labelName {
             width: 238px;
             text-align: center;
             font-family: apple chancery, cursive;
             margin-left: 110px;
             display: block;
             color: #FFCC00;
+        }
+
+        textarea {
+            width: 600px;
+            height: 100px;
+        }
+
+        #lblReview {
+            font-weight: bold;
+        }
+
+        #selectList {
+            margin-right: 80px;
+            float: right;
+        }
+
+        #reviewBox {
+            border: 1px outset white;
+            box-shadow: 4px 6px 8px;
+            width: 1000px;
+        }
+
+        #reviewForm {
+            margin-top: 50px;
+            width: 800px;
+        }
+
+        #reviewText {
+            width: 600px;
+        }
+
+        .crewImages {
+            height: 200px;
+            width: 215px;
+        }
+
+        .card {
+            height: 100%;
+        }
+
+        #formBody {
+            margin-left: auto;
+            margin-right: auto;
+            width: 55%;
+            margin-bottom: 50px;
+        }
+
+        #formInputs {
+            width: 100%;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        #colLeft {
+            float: left;
+        }
+
+        #colRight {
+            float: right;
+            padding-left: 10px;
+        }
+
+        .empty {
+            border: 1px solid red;
         }
     </style>
 </head>
@@ -70,15 +134,15 @@
         </nav>
     </header>
     <div id=imageOverlay>
-        <img id="grassImage" src="~/Images/petar-tonchev-c-5-QE5kBYk-unsplash.jpg"/>
-        <div id="labelLogo"> 
+        <img id="grassImage" src="~/Images/petar-tonchev-c-5-QE5kBYk-unsplash.jpg" />
+        <div id="labelLogo">
             <img id="logo" src="~/Images/clipart2394299.png" />
             <h1 id="labelName">Castillo Lawn & Care LLC.</h1>
         </div>
     </div>
-    
+
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-3" style="margin: 0;">
             @RenderBody()
         </main>
     </div>
@@ -91,6 +155,96 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        $(document).ready(function(){
+            FillTextboxOnNull();
+            $("#formSubmit").click(function(e) {
+                FillTextboxOnNull();
+                let test = $("#showFormError")
+                if($(".empty").length > 0){
+                    e.preventDefault();
+                    if($("#showFormError").length == 0){
+                        $("#successMessage").text("");
+                        const newElement = document.createElement("p")
+                        newElement.setAttribute('id', 'showFormError');
+                        newElement.style.color = "red";
+                        newElement.style.fontSize = "24px";
+                        newElement.textContent = "The form has empty inputs";
+                        var body = document.getElementById('formBody')
+                        body.insertBefore(body.appendChild(newElement), body.firstElementChild.nextElementSibling);
+                    };
+
+                };
+            });
+
+            let calendarId = document.getElementById("calendar");
+            if(calendarId !== null){
+                calendarRender();
+            }
+
+            function calendarRender(){
+                $.ajax({
+                    type:'GET',
+                    url: '@Url.Action("LoadAppointments", "Home")',
+                    success: function(result){
+                        var obj = JSON.parse(result);
+                        var calendarEl = document.getElementById('calendar');
+                        var calendar = new FullCalendar.Calendar(calendarEl, {
+                            selectable: true,
+                            headerToolbar: {
+                                left: 'prev,next today',
+                                center: 'title',
+                                right: 'dayGridMonth,timeGridWeek'
+                            }, 
+                            eventDidMount: function(info) {
+                                console.log(info.event);
+                                //var toolTip = new Tooltip(info.el, {
+                                //    title: info.event.extendedProps.description,
+                                //    placement: 'top',
+                                //    trigger: 'hover',
+                                //    container: 'body'
+                                //});
+                            }
+                        });
+                        for (let item of obj){
+                            calendar.addEvent({
+                                title: item.AppointmentType,
+                                start: item.AppointmentDate,
+                                description: item.serviceType,
+                                allDay: false
+                            });
+                        };
+                        
+                        
+                    calendar.render();
+                    }
+                })
+
+            };
+
+            $("input[type='Text']").change(function () {
+                if($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).addClass('empty');
+                } else {
+                    $(this).removeClass('empty');
+                };
+            });
+
+            function FillTextboxOnNull(){
+                $("input[type='Text']").each(function (){
+                    if($.trim($(this).val()) == '') {
+                        isValid = false;
+                        $(this).addClass('empty');
+                     } else {
+                        $(this).removeClass('empty');
+                    };
+                });
+            }
+
+        });
+    </script>
 </body>
 </html>

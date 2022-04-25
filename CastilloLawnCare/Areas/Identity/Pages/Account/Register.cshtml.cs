@@ -94,6 +94,10 @@ namespace CastilloLawnCare.Areas.Identity.Pages.Account
             [Display(Name = "Address")]
             public string Address { get; set; }
 
+            [Required]
+            [Phone]
+            [Display(Name = "Phone Number")]
+            public string Phone { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -160,6 +164,7 @@ namespace CastilloLawnCare.Areas.Identity.Pages.Account
                      
                     if(defaultRole != null)
                     {
+                        //Added this so roles can be added for users with default role
                         IdentityResult roleResult = await _userManager.AddToRoleAsync(user, defaultRole.NormalizedName);
                     }
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

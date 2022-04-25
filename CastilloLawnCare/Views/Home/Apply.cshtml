@@ -1,0 +1,113 @@
+﻿@model CastilloLawnCare.Models.ViewModels.vmAppointment
+@{
+    ViewData["Title"] = "Apply";
+    string formInputs = "formInputs";
+    List<string> errorList = new List<string>();
+    if (ViewBag.ErrorList != null)
+    {
+        errorList = ViewBag.ErrorList;
+    }
+}
+
+<div id="formBody">
+    <h1>Apply</h1>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        @if (ViewBag.Success != null)
+        {
+            @if (!ViewBag.Success)
+            {
+                if (errorList.Count > 0)
+                {
+                    foreach (var err in errorList)
+                    {
+                        <p style="font-size: 24px; color: red;">@err</p>
+                    }
+                }
+                else
+                {
+                    <p style="font-size: 24px; color: red;">@ViewBag.Error</p>
+                }
+            }
+            else
+            {
+                <p id="successMessage" style="color: green; font-size: 24px;">Your Appointment has been Scheduled - We will Contact you soon!</p>
+            }
+
+        }
+        @using (Html.BeginForm("Apply", "Home", FormMethod.Post, new { Id = "estimationForm" }))
+        {
+            <div class="row-cols-2" style="width: 100%;">
+                <div class="col-sm-6" id="colLeft">
+                    @Html.LabelFor(model => model.FirstName, "First Name: ")
+                    @Html.EditorFor(model => model.FirstName, new {htmlAttributes = new {@id = @formInputs}})
+                </div>
+                <div class="col-sm-6" id="colRight">
+                    @Html.LabelFor(model => model.LastName, "Last Name: ")
+                    @Html.EditorFor(model => model.LastName, new {htmlAttributes = new {@id = @formInputs}})
+                </div>
+            </div>
+            <div class="row-cols-1">
+                <div class="col-sm-12">
+                    @Html.LabelFor(model => model.Address, "Address: ")
+                    @Html.EditorFor(model => model.Address, new {htmlAttributes = new {@id = @formInputs}})
+                </div>
+            </div>
+            <div class="row-cols-2">
+                <div class="col-sm-6" id="colLeft">
+                    @Html.LabelFor(model => model.City, "City: ")
+                    @Html.EditorFor(model => model.City, new {htmlAttributes = new {@id = @formInputs}})
+                </div>
+                <div class="col-sm-6" id="colRight">
+                    @Html.LabelFor(model => model.State, "State: ")
+                    @Html.EditorFor(model => model.State, new {htmlAttributes = new {@id = @formInputs}})
+                </div>
+            </div>
+            <div class="row-cols-1">
+                <div class="col-sm-12">
+                    @Html.LabelFor(model => model.Email, "Email: ")
+                    @Html.EditorFor(model => model.Email, new {htmlAttributes = new {@id = @formInputs}})
+                </div>
+            </div>
+            <div class="row-cols-2">
+                <div class="col-sm-6" id="colLeft">
+                    @Html.LabelFor(model => model.PhoneNumber, "Phone Number: ")
+                    @Html.EditorFor(model => model.PhoneNumber, new {htmlAttributes = new {@id = @formInputs}})
+                </div>
+                <div class="col-sm-6" id="colRight">
+                    @Html.LabelFor(model => model.AppointmentDate, "Appointment Date: ")
+                    @Html.EditorFor(model => model.AppointmentDate, new {htmlAttributes = new {@id = @formInputs, @style="height: 30px;"}})
+                </div>
+            </div>
+            <div class="row-cols-2">
+                <div class="col-sm-6" id="colLeft">
+                    @Html.LabelFor(model => model.AppointmentTypeID,"Appointment Type: ")
+                    @Html.DropDownListFor(model => model.AppointmentTypeID, new List<SelectListItem>
+                    {
+                        new SelectListItem {Text = "Estimation Appointment", Value = "1"},
+                        new SelectListItem {Text = "Service Appointment", Value = "2"}
+                    }, "", new {@id = @formInputs})
+                </div>
+                <div class="col-sm-6" id="colRight">
+                    @Html.LabelFor(model => model.ServiceID, "Service: ")
+                    @Html.DropDownListFor(model => model.ServiceID, Model.ServiceList, "", new {@id = @formInputs})
+                </div>
+            </div>
+            <div class="row-cols-1" style="width: 20%;">
+                @Html.HiddenFor(modal => modal.Id);
+                <input type="submit" id="formSubmit" name="submit" value="Submit" style="margin-top: 15px; border-radius: 15px;" />
+            </div>
+        }
+        <br />
+        <p>
+            *The information given upon registration will show as is - Please double check all information is correct!
+            Your information may be edited to ensure we have your correct information before contact.
+        </p>
+    }
+    else
+    {
+        <p style="font-size: 24px; color: red;">@ViewBag.Error</p>
+    }
+
+</div>
