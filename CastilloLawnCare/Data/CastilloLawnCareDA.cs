@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using MySqlConnector;
 using System.Configuration;
 
 namespace CastilloLawnCare.Data
@@ -10,11 +11,11 @@ namespace CastilloLawnCare.Data
         {
              configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         }
-        public SqlConnection CreateConnection()
+        public MySqlConnection CreateConnection()
         {
             
-            string connectionString = configuration.GetConnectionString("DefaultConnection");
-            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            string connectionString = configuration.GetConnectionString("CastilloLawnCareConn");
+            MySqlConnection sqlConnection = new MySqlConnection(connectionString);
             try
             {
                 sqlConnection.Open();

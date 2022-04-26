@@ -1,5 +1,6 @@
 ﻿using CastilloLawnCare.Models.DataModels;
-using Microsoft.Data.SqlClient;
+//using Microsoft.Data.SqlClient;
+using MySqlConnector;
 
 namespace CastilloLawnCare.Data
 {
@@ -9,9 +10,9 @@ namespace CastilloLawnCare.Data
         public void AddReview(dmCustomerReview dmCustomerReview)
         {
             string query = "Insert Into Reviews (Description, UserID, ReviewPostedDate, Rating)" +
-                           "Values (@Description, @UserID, @ReviewDate, @Rating)";
+                           "Values (@Description, @UserID, @ReviewDate, @Rating);";
 
-            using (SqlCommand cmd = new SqlCommand(query, da.CreateConnection()))
+            using (MySqlCommand cmd = new MySqlCommand(query, da.CreateConnection()))
             {
                 cmd.Parameters.AddWithValue("@Description", dmCustomerReview.Description);
                 cmd.Parameters.AddWithValue("@UserID", dmCustomerReview.UserID);
@@ -21,7 +22,7 @@ namespace CastilloLawnCare.Data
                 {
                     cmd.ExecuteNonQuery();
                 }
-                catch (SqlException sqlEx)
+                catch (MySqlException sqlEx)
                 {
                     throw new Exception(sqlEx.Message);
                 }
@@ -31,13 +32,13 @@ namespace CastilloLawnCare.Data
         public List<dmCustomerReview> GetReviews()
         {
             List<dmCustomerReview> reviews = new List<dmCustomerReview>();
-            string query = "Select Top 5 * From Reviews Order By ReviewPostedDate Desc";
+            string query = "Select * From Reviews Order By ReviewPostedDate Desc Limit 5;";
 
-            using (SqlCommand cmd = new SqlCommand(query, da.CreateConnection()))
+            using (MySqlCommand cmd = new MySqlCommand(query, da.CreateConnection()))
             {
                 try
                 {
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.HasRows)
                         {
@@ -48,7 +49,7 @@ namespace CastilloLawnCare.Data
                         }
                     }
                 }
-                catch (SqlException sqlEx)
+                catch (MySqlException sqlEx)
                 {
                     throw new Exception(sqlEx.Message);
                 }
@@ -59,9 +60,9 @@ namespace CastilloLawnCare.Data
         public void AddAppointment(dmAppointment dmAppointment)
         {
             string query = "Insert Into ClientAppointments (AppointmentDate, AppointmentTypeID, ServiceID, UserID)" +
-                           "Values (@AppointmentDate, @AppointmentTypeID, @ServiceID, @UserID)";
+                           "Values (@AppointmentDate, @AppointmentTypeID, @ServiceID, @UserID);";
 
-            using (SqlCommand cmd = new SqlCommand(query, da.CreateConnection()))
+            using (MySqlCommand cmd = new MySqlCommand(query, da.CreateConnection()))
             {
                 cmd.Parameters.AddWithValue("@AppointmentDate", dmAppointment.AppointmentDate);
                 cmd.Parameters.AddWithValue("@AppointmentTypeID", dmAppointment.AppointmentTypeID);
@@ -72,7 +73,7 @@ namespace CastilloLawnCare.Data
                 {
                     cmd.ExecuteNonQuery();
                 }
-                catch(SqlException sqlEx)
+                catch(MySqlException sqlEx)
                 {
                     throw new Exception(sqlEx.Message);
                 }
@@ -83,15 +84,15 @@ namespace CastilloLawnCare.Data
         public List<dmAppointment> GetAppointmentsByUserID(string userID)
         {
             List<dmAppointment> dmAppointmentList = new List<dmAppointment>();
-            string query = "Select * From ClientAppointments Where UserID = @UserID";
+            string query = "Select * From ClientAppointments Where UserID = @UserID;";
             
-            using(SqlCommand cmd = new SqlCommand(query, da.CreateConnection()))
+            using(MySqlCommand cmd = new MySqlCommand(query, da.CreateConnection()))
             {
                 try
                 {
                     cmd.Parameters.AddWithValue("@UserID", userID);
 
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.HasRows)
                         {
@@ -106,7 +107,7 @@ namespace CastilloLawnCare.Data
                         }
                     }
                 }
-                catch(SqlException sqlEx)
+                catch(MySqlException sqlEx)
                 {
                     throw new Exception(sqlEx.Message);
                 }
@@ -117,13 +118,13 @@ namespace CastilloLawnCare.Data
         public string GetAppointmentTypeByID(int id)
         {
             string appointmentType = null;
-            string query = "Select AppointmentType from AppointmentTypes where AppointmentTypeID = @AppointmentTypeID";
-            using( SqlCommand cmd = new SqlCommand(query, da.CreateConnection()))
+            string query = "Select AppointmentType from AppointmentTypes where AppointmentTypeID = @AppointmentTypeID;";
+            using( MySqlCommand cmd = new MySqlCommand(query, da.CreateConnection()))
             {
                 try
                 {
                     cmd.Parameters.AddWithValue("@AppointmentTypeID", id);
-                    using(SqlDataReader dr = cmd.ExecuteReader())
+                    using(MySqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.HasRows)
                         {
@@ -134,7 +135,7 @@ namespace CastilloLawnCare.Data
                         }
                     }
                 }
-                catch(SqlException sqlEx)
+                catch(MySqlException sqlEx)
                 {
                     throw new Exception(sqlEx.Message);
                 }
@@ -145,12 +146,12 @@ namespace CastilloLawnCare.Data
         public List<dmService> GetServices()
         {
             List<dmService> dmServices = new List<dmService>();
-            string query = "Select * From dbo.ServiceTypes";
-            using( SqlCommand cmd = new SqlCommand(query, da.CreateConnection()))
+            string query = "Select * From ServiceTypes;";
+            using( MySqlCommand cmd = new MySqlCommand(query, da.CreateConnection()))
             {
                 try
                 {
-                    using(SqlDataReader dr = cmd.ExecuteReader())
+                    using(MySqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.HasRows)
                         {
@@ -161,7 +162,7 @@ namespace CastilloLawnCare.Data
                         }
                     }
                 }
-                catch (SqlException sqlEx)
+                catch (MySqlException sqlEx)
                 {
                     throw new Exception(sqlEx.Message);
                 }
@@ -172,13 +173,13 @@ namespace CastilloLawnCare.Data
         public string GetServiceTypeByID(int id)
         {
             string serviceType = null;
-            string query = "Select ServiceType from ServiceTypes where ServiceID = @ServiceID";
-            using (SqlCommand cmd = new SqlCommand(query, da.CreateConnection()))
+            string query = "Select ServiceType from ServiceTypes where ServiceID = @ServiceID;";
+            using (MySqlCommand cmd = new MySqlCommand(query, da.CreateConnection()))
             {
                 try
                 {
                     cmd.Parameters.AddWithValue("@ServiceID", id);
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.HasRows)
                         {
@@ -189,7 +190,7 @@ namespace CastilloLawnCare.Data
                         }
                     }
                 }
-                catch (SqlException sqlEx)
+                catch (MySqlException sqlEx)
                 {
                     throw new Exception(sqlEx.Message);
                 }

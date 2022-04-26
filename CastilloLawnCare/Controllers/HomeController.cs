@@ -93,17 +93,21 @@ namespace CastilloLawnCare.Controllers
             List<vmAppointment> vmAppointmentList = new List<vmAppointment>();
             var currentUserID = (HttpContext.User.Identity as ClaimsIdentity).Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
             var dmAppointmentList = _castilloLawnCareDBData.GetAppointmentsByUserID(currentUserID);
-            var newDmAppointment = dmAppointmentList.Select(x => new dmAppointment() { AppointmentTypeID = x.AppointmentTypeID, ServiceID = x.ServiceID} ).FirstOrDefault();
-            var AppointmentType = _castilloLawnCareDBData.GetAppointmentTypeByID(newDmAppointment.AppointmentTypeID);
-            var serviceType = _castilloLawnCareDBData.GetServiceTypeByID(newDmAppointment.ServiceID);
-
-            foreach(var item in dmAppointmentList)
+            if(dmAppointmentList.Count > 0)
             {
-                var vmAppointment = ParseDMAppointToVMAppointWithoutServiceAndApptType(item);
-                vmAppointment.AppointmentType = AppointmentType;
-                vmAppointment.ServiceType = serviceType;
-                vmAppointmentList.Add(vmAppointment);
+                var newDmAppointment = dmAppointmentList.Select(x => new dmAppointment() { AppointmentTypeID = x.AppointmentTypeID, ServiceID = x.ServiceID }).FirstOrDefault();
+                var AppointmentType = _castilloLawnCareDBData.GetAppointmentTypeByID(newDmAppointment.AppointmentTypeID);
+                var serviceType = _castilloLawnCareDBData.GetServiceTypeByID(newDmAppointment.ServiceID);
+
+                foreach (var item in dmAppointmentList)
+                {
+                    var vmAppointment = ParseDMAppointToVMAppointWithoutServiceAndApptType(item);
+                    vmAppointment.AppointmentType = AppointmentType;
+                    vmAppointment.ServiceType = serviceType;
+                    vmAppointmentList.Add(vmAppointment);
+                }
             }
+            
             //vmAppointment vmAppointment = new vmAppointment()
             //{
             //    AppointmentDate = DateTime.Now.AddHours(6),
